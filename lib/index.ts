@@ -9,6 +9,11 @@
 
 import { createWatcher } from "./watcher";
 import { Rebooter } from "./rebooter";
+import { exec as badExec} from "child_process";
+import { promisify } from "util";
+
+// make exec into promise based
+const exec = promisify(badExec);
 
 // look for changes here:
 const DirToWatch = process.argv[2] || "./lib/" // could also be a file not a directory (use ./where-ever)
@@ -22,14 +27,26 @@ const rebooter = new Rebooter(fileToRun, process.argv.slice(4)); //TODO args bru
 // start the rebooter
 rebooter.start();
 
-createWatcher(DirToWatch, (fileName)=>{
-    console.clear();
-    console.log(" ---------------- RESTARTING APP ----------------")
+async function callOnFileChange(filename: string){
+    // this function assumes a .ts file is being watched
+    // it will kill the app, compile ts to js, run the js
 
-    // if there is a change, kill and then restart the node app
+    console.clear();
+
+    // kill app
+    console.log("---------- KLLING APP ----------");
     rebooter.terminate();
 
-    rebooter.startAfter(1000);
+    // compile ts
+    console.log("---------- COMPILING TS ----------");
+    const {stderr, stdout} = await exec("tsc");
 
-    console.log(" ---------------- APP RESTARTED ----------------")
-});
+    // start the app
+    console.log(" ---------------- STARTING APP ----------------")
+    rebooter.startAfter(200);
+
+    console.log("\n\n---------------- APP RESTARTED ----------------")
+};
+
+// create watchers on dirToWatch and all subDirs
+createWatcher(DirToWatch, callOnFileChange);
