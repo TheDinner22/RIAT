@@ -39,7 +39,7 @@ export class Rebooter {
             this.startCalled = false;
 
             if (error && error.signal != "SIGINT"){this.handleError(error)} // bad idea bad idea bad idea!!!
-            else{console.log(`------------------ ${this.fname} ENDED. NO ERRORS ------------------`);}
+            // else{console.log(`------------------ ${this.fname} ENDED. NO ERRORS ------------------`);}
         });
 
         this.nodeApp.stdout?.on("data", (data)=>{
@@ -57,7 +57,7 @@ export class Rebooter {
     };
 
     terminate(){
-        if(!this.startCalled){console.log("nothing to kill");return;}
+        if(!this.startCalled){return;}
         this.startCalled = false;
         this.nodeApp.kill("SIGINT");
     };

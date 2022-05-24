@@ -9,11 +9,7 @@
 
 import { createWatcher } from "./watcher";
 import { Rebooter } from "./rebooter";
-import { exec as badExec} from "child_process";
-import { promisify } from "util";
-
-// make exec into promise based
-const exec = promisify(badExec);
+import { exec } from "child_process";
 
 // look for changes here:
 const DirToWatch = process.argv[2] || "./lib/" // could also be a file not a directory (use ./where-ever)
@@ -27,7 +23,7 @@ const rebooter = new Rebooter(fileToRun, process.argv.slice(4)); //TODO args bru
 // start the rebooter
 rebooter.start();
 
-async function callOnFileChange(filename: string){
+function callOnFileChange(filename: string){
     // this function assumes a .ts file is being watched
     // it will kill the app, compile ts to js, run the js
 
@@ -36,16 +32,26 @@ async function callOnFileChange(filename: string){
     // kill app
     console.log("---------- KLLING APP ----------");
     rebooter.terminate();
+    console.log("---------- APP KILLED ----------\n");
 
     // compile ts
     console.log("---------- COMPILING TS ----------");
-    const {stderr, stdout} = await exec("tsc");
+    exec("tsc", (error, stdout, stderr)=>{
+        // we dont throw error because tsc will error for tsc compiler issues which is expected when
+        // writing code in typescript
+        // the rebooter should not error when the ts does not compile
+        if (stdout != ""){
+            console.log("-------------- COMPILER ERROR --------------");
+            console.log("stdout errors");
+            console.log("------------ END COMPILER ERROR ------------\n");
+        }else{console.log("---------- COMPILIED WITHOUT ERRORS ----------\n");}
 
-    // start the app
-    console.log(" ---------------- STARTING APP ----------------")
-    rebooter.startAfter(200);
 
-    console.log("\n\n---------------- APP RESTARTED ----------------")
+        // start the app
+        console.log("---------------- STARTING APP ----------------");
+        rebooter.start();
+        console.log("---------------- APP RESTARTED ---------------\n");
+    });
 };
 
 // create watchers on dirToWatch and all subDirs

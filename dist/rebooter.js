@@ -39,9 +39,7 @@ class Rebooter {
             if (error && error.signal != "SIGINT") {
                 this.handleError(error);
             } // bad idea bad idea bad idea!!!
-            else {
-                console.log(`------------------ ${this.fname} ENDED. NO ERRORS ------------------`);
-            }
+            // else{console.log(`------------------ ${this.fname} ENDED. NO ERRORS ------------------`);}
         });
         (_a = this.nodeApp.stdout) === null || _a === void 0 ? void 0 : _a.on("data", (data) => {
             console.log(`\x1b[44m${this.fname}\x1b[0m:\x1b[35m${this.nodeApp.pid}\x1b[0m just logged:\n----------`);
@@ -58,7 +56,6 @@ class Rebooter {
     ;
     terminate() {
         if (!this.startCalled) {
-            console.log("nothing to kill");
             return;
         }
         this.startCalled = false;

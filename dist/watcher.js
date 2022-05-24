@@ -26,7 +26,10 @@ class Watcher {
                 this.waitPlz = false;
             }, 300);
             if (filename && event === "change") {
-                this.onEdit(filename);
+                console.log(`\x1b[41m${this.path} WAS CHANGED\x1b[0m`);
+                setTimeout(() => {
+                    this.onEdit(filename);
+                }, 2000);
             }
         });
     }
@@ -48,4 +51,3 @@ function createWatcher(path, onEdit) {
 }
 exports.createWatcher = createWatcher;
 ;
-createWatcher("./../../fedoraenv/fedora/lib", (file) => { console.log(file); });
