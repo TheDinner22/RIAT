@@ -38,7 +38,7 @@ function callOnFileChange(filename: string){
 
     // compile ts
     console.log("---------- COMPILING TS ----------");
-    exec(`tsc -p ${TsconfigPathFromProjectRoot}`, (error, stdout, stderr)=>{
+    exec('tsc -p ' + TsconfigPathFromProjectRoot, (error, stdout, stderr)=>{
         // we dont throw error because tsc will error for tsc compiler issues which is expected when
         // writing code in typescript
         // the rebooter should not error when the ts does not compile
