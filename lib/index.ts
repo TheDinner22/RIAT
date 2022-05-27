@@ -17,7 +17,7 @@ const DirToWatch = process.argv[2] || "./fedora/lib/" // could also be a file no
 // run and re-run here when changed
 const fileToRun = process.argv[3] || "fedora/dist/index.js" // imagine calling node ${fileToRun}
 
-const TsconfigPathFromRoot = process.argv[4] || "./tsconfig.json"
+const TsconfigPathFromProjectRoot = process.argv[4] || "./tsconfig.json"
 
 // create new rebooter
 const rebooter = new Rebooter(fileToRun, process.argv.slice(5)); //TODO args bruh
@@ -38,7 +38,7 @@ function callOnFileChange(filename: string){
 
     // compile ts
     console.log("---------- COMPILING TS ----------");
-    exec('tsc -p', (error, stdout, stderr)=>{
+    exec(`tsc -p ${TsconfigPathFromProjectRoot}`, (error, stdout, stderr)=>{
         // we dont throw error because tsc will error for tsc compiler issues which is expected when
         // writing code in typescript
         // the rebooter should not error when the ts does not compile
