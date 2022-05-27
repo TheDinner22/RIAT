@@ -10,7 +10,7 @@
 
 - no npm dependencies (wont kill children of children LLL)
 
-- pass args to dist/index.js (after passing dir to watch and file to run)
+- pass args to dist/index.js (after passing dir to watch and file to run and path the .tsconfig relative to dist/index.js)
 
 ## only works on linux
 
