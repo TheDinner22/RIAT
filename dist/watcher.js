@@ -24,12 +24,12 @@ class Watcher {
             this.waitPlz = true;
             setTimeout(() => {
                 this.waitPlz = false;
-            }, 300);
+            }, 5000);
             if (filename && event === "change") {
                 console.log(`\x1b[41m${this.path} WAS CHANGED\x1b[0m`);
                 setTimeout(() => {
                     this.onEdit(filename);
-                }, 2000);
+                }, 2500);
             }
         });
     }

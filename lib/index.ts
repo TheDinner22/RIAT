@@ -12,10 +12,10 @@ import { Rebooter } from "./rebooter";
 import { exec } from "child_process";
 
 // look for changes here:
-const DirToWatch = process.argv[2] || "./lib/" // could also be a file not a directory (use ./where-ever)
+const DirToWatch = process.argv[2] || "./fedora/lib/" // could also be a file not a directory (use ./where-ever)
 
 // run and re-run here when changed
-const fileToRun = process.argv[3] || "dist/index.js" // imagine calling node ${fileToRun}
+const fileToRun = process.argv[3] || "fedora/dist/index.js" // imagine calling node ${fileToRun}
 
 // create new rebooter
 const rebooter = new Rebooter(fileToRun, process.argv.slice(4)); //TODO args bruh

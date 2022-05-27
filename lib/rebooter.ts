@@ -11,7 +11,7 @@
  * 
  */
 
-import { ChildProcess, exec, execFile, ExecFileException } from "child_process";
+import { ChildProcess, execFile, ExecFileException } from "child_process";
 
 export class Rebooter {
     fname: string;

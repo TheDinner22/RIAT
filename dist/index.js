@@ -14,7 +14,7 @@ const child_process_1 = require("child_process");
 // look for changes here:
 const DirToWatch = process.argv[2] || "./lib/"; // could also be a file not a directory (use ./where-ever)
 // run and re-run here when changed
-const fileToRun = process.argv[3] || "dist/index.js"; // imagine calling node ${fileToRun}
+const fileToRun = process.argv[3] || "fedora/dist/index.js"; // imagine calling node ${fileToRun}
 // create new rebooter
 const rebooter = new rebooter_1.Rebooter(fileToRun, process.argv.slice(4)); //TODO args bruh
 // start the rebooter
