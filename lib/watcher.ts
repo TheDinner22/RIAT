@@ -1,59 +1,56 @@
 /**
- * watch for file changes in a given dir
- * create event to bind to when file changes
+ * 
+ * watch for file changes in a dir
+ * expose function that is called when file changes
  * 
  */
 
-import { watch } from "fs";
-import { exec } from "child_process";
+import { watch, readFile } from "fs";
+import { promisify } from "util";
+import { getSubDirectoriesRecursive } from "./getAllDirs"
+import config from "./config";
 
-class Watcher {
-    private waitPlz: boolean;
-    private path: string;
+const readFileProm = promisify(readFile);
+
+class DirWatcher {
+    private dirPath: string;
+    private fsWait: boolean;
+    private md5Previous: string;
     private onEdit: (fileName: string) => void;
-
-    constructor(path: string, onEdit: (fileName: string) => void){
-        this.waitPlz = false;
-        this.path = path;
+    
+    constructor(dirPath: string, onEdit: (fileName: string) => void){
+        this.dirPath = dirPath;
+        this.fsWait = false;
+        this.md5Previous = "";
         this.onEdit = onEdit;
-
-        this.makeWatch();
+        
+        
+        console.log(`Watching for file changes on ${this.dirPath}`);
+        this.watchADir();
     }
 
-    private makeWatch(){
-        watch(this.path, (event, filename)=>{
-            // a little de bounce trolling
-            if(this.waitPlz){return}
-            this.waitPlz = true;
-            setTimeout(() => {
-                this.waitPlz = false;
-            }, 5000);
-
-            if (filename && event === "change"){
-                console.log(`\x1b[41m${this.path} WAS CHANGED\x1b[0m`)
+    watchADir(){
+        watch(this.dirPath, async (event, filename) => {
+            if (filename && event === "change") {
+                // little de bounce trolling
+                if (this.fsWait) { return; }
+                this.fsWait = true;
                 setTimeout(() => {
-                    this.onEdit(filename);
-                }, 2500);
-            }
+                    this.fsWait = false;
+                }, config.deBounceMilis);
             
+                this.onEdit(filename);
+            }
         });
-    }
+    };
 }
 
-export function createWatcher(path: string, onEdit: (filename: string)=>void){
-    // get all sub dirs
-    exec(`dir ${path} -R -1`, (error, stdout, stderr)=>{
-        let dirNames: string[] = [];
-        const lines = stdout.split("\n");
-        lines.forEach((line)=>{
-            if(line.endsWith(":")){
-                dirNames.push(line.slice(0, -1));
-            }
-        });
+export function makeWatcher(dirPath: string, onEdit: (filename: string) => void){
+    // get list of all sub dirs
+    const dirsList = getSubDirectoriesRecursive(dirPath);
 
-        dirNames.forEach((dirName)=>{
-            new Watcher(dirName, onEdit)
-        });
+    // create bunch of watchers
+    dirsList.forEach((dirPath) => {
+        new DirWatcher(dirPath, onEdit);
     });
-
 };

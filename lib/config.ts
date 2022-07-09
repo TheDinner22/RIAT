@@ -6,14 +6,14 @@
 
 interface configENV {
     iam?: string
-    dirToWatch: string
+    dirsToWatch: string[] 
     deBounceMilis: number
 }
 
 const ENV: configENV = {
     "iam": "hot as hell",
-    "dirToWatch" : "./lib",
-    "deBounceMilis": 100
+    "dirsToWatch" : [ "./lib" ],
+    "deBounceMilis": 200
 };
 
 export default ENV;
