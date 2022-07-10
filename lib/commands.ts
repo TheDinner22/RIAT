@@ -13,8 +13,12 @@
 import { ChildProcess, execFile, exec, ExecFileException, ExecException } from "child_process";
 import { promisify } from "util";
 
-export type ExecExitHandler = (error: ExecException | null, stdout: string, stderr: string) => void;
-export type ExecFileExitHandler = (error: ExecFileException | null, stdout: string, stderr: string) => void;
+interface bothStdOuts {
+    stdout: string
+    stderr: string
+};
+export type ExecExitHandler = (error: ExecException | null, std: bothStdOuts) => void;
+export type ExecFileExitHandler = (error: ExecFileException | null, std: bothStdOuts) => void;
 
 export class NodeApp{
     fname: string;
@@ -29,7 +33,7 @@ export class NodeApp{
         this.fname = fileName;
         this.args = args;
         if(typeof onExit === "undefined"){
-            this.onExit = (error: ExecFileException | null, stdout: string, stderr: string) => {};
+            this.onExit = (error: ExecFileException | null, std: bothStdOuts) => {};
         }
         else{
             this.onExit = onExit
@@ -53,7 +57,7 @@ export class NodeApp{
 
             if (!doNotHandleErrors && error && error.signal != "SIGINT"){this.handleError(error);return;} // bad idea bad idea bad idea!!!
 
-            this.onExit(error, stdout, stderr);
+            onExit(error, {stdout, stderr});
         });
 
         if(logWhatApplogs){
@@ -94,7 +98,9 @@ export function command(args: string[], onExit?: ExecExitHandler){
     // call command 
     exec(cmdStr, (error, stdout, stderr)=>{
         if(typeof onExit !== "undefined"){
-            onExit(error, stdout, stderr);
+            onExit(error, {stdout, stderr});
         }
     });
 };
+
+export const promiseCommand = promisify(command);
