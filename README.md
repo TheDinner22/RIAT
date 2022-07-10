@@ -14,7 +14,10 @@
 
 ## what is it (short version)?
 
-In the lib/config.ts file, set which directories you want to be watched. 
+1. In the lib/config.ts file, set which directories you want to be watched.
+2. write code to be run in the lib/index.ts file
+3. compile tpyescript
+4. move ./dist dir into your project and run "node ./dist/index.js" and enjoy!
 
 ## about
 
