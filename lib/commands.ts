@@ -15,8 +15,6 @@ import { ChildProcess, execFile, exec, ExecFileException, ExecException } from "
 type ExecExitHandler = (error: ExecException | null, stdout: string, stderr: string) => void;
 type ExecFileExitHandler = (error: ExecFileException | null, stdout: string, stderr: string) => void;
 
-
-
 export class NodeApp{
     fname: string;
     private args: Array<string>;
@@ -31,7 +29,7 @@ export class NodeApp{
         this.onExit = onExit;
     }
     
-    handleError(error: ExecFileException){
+    private handleError(error: ExecFileException){
         console.log("----------------- \x1b[41mERROR\x1b[0m in nodeApp (prolly ur code not mine! LLL) -----------------");
         console.log("--------------- BEGIN ERROR ---------------\n");
         console.error(error);
@@ -53,7 +51,7 @@ export class NodeApp{
 
         if(logWhatApplogs){
             this.nodeApp.stdout?.on("data", (data) => {
-                console.log(data)
+                console.log(`\x1b[0m:\x1b[35m${this.nodeApp.pid}\x1b[0m` + ":" , data);
             });
         }
     };
