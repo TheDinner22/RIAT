@@ -41,8 +41,7 @@ class DirWatcher {
                     this.fsWait = false;
                 }, config.deBounceMilis);
             
-                const dirName = filename.split("/")[0]
-                this.onEdit(dirName, filename, NodeApp, command);
+                this.onEdit(this.dirPath, filename, NodeApp, command);
             }
         });
     };
