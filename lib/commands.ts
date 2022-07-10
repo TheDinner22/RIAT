@@ -11,9 +11,10 @@
  */
 
 import { ChildProcess, execFile, exec, ExecFileException, ExecException } from "child_process";
+import { promisify } from "util";
 
-type ExecExitHandler = (error: ExecException | null, stdout: string, stderr: string) => void;
-type ExecFileExitHandler = (error: ExecFileException | null, stdout: string, stderr: string) => void;
+export type ExecExitHandler = (error: ExecException | null, stdout: string, stderr: string) => void;
+export type ExecFileExitHandler = (error: ExecFileException | null, stdout: string, stderr: string) => void;
 
 export class NodeApp{
     fname: string;
@@ -21,12 +22,18 @@ export class NodeApp{
     private nodeApp!: ChildProcess;
     private startCalled = false;
     private onExit: ExecFileExitHandler;
+    badSolutionLLL = promisify(this.start).bind(this);
 
 
-    constructor(fileName: string, args: string[], onExit: ExecFileExitHandler){
+    constructor(fileName: string, args: string[], onExit?: ExecFileExitHandler){
         this.fname = fileName;
         this.args = args;
-        this.onExit = onExit;
+        if(typeof onExit === "undefined"){
+            this.onExit = (error: ExecFileException | null, stdout: string, stderr: string) => {};
+        }
+        else{
+            this.onExit = onExit
+        }
     }
     
     private handleError(error: ExecFileException){
@@ -37,16 +44,16 @@ export class NodeApp{
     };
 
     // start
-    start(logWhatApplogs = true){
+    start(logWhatApplogs = true, doNotHandleErrors = false, onExit: ExecFileExitHandler = this.onExit){
         if(this.startCalled){console.log("cannot start twice");return;}
         this.startCalled = true;
 
         this.nodeApp = execFile("node", [this.fname, ...this.args], (error, stdout, stderr) => {
             this.startCalled = false;
 
-            if (error && error.signal != "SIGINT"){this.handleError(error);return;} // bad idea bad idea bad idea!!!
+            if (!doNotHandleErrors && error && error.signal != "SIGINT"){this.handleError(error);return;} // bad idea bad idea bad idea!!!
 
-            this.onExit(error, stdout, stderr)
+            this.onExit(error, stdout, stderr);
         });
 
         if(logWhatApplogs){
@@ -55,6 +62,10 @@ export class NodeApp{
             });
         }
     };
+
+    promiseStart(logWhatApplogs = true, doNotHandleErrors = false){
+        return this.badSolutionLLL(logWhatApplogs, doNotHandleErrors);
+    }
 
     // stop
     stop(exitCode: number | NodeJS.Signals = "SIGINT"){
@@ -68,12 +79,9 @@ export class NodeApp{
 
 // BIG FUCKING WARNING!!!! this function is dangerous!!!!!
 // exec is dangerous!!! double triple check whatever you pass into it
-export function command(args: string[], onExit: ExecExitHandler){
+export function command(args: string[], onExit?: ExecExitHandler){
     // make sure there are args
     if(args.length === 0){throw new Error("args was an empty list. Can't do dat");}
-
-    // if no onExit was provided, sub in dummy funcion
-    onExit = typeof onExit === "undefined" ? (a: any, b: any, c: any)=>{} : onExit;
 
     // trim each element of the args list
     for (let i = 0; i < args.length; i++) {
@@ -84,5 +92,9 @@ export function command(args: string[], onExit: ExecExitHandler){
     const cmdStr = args.join(" ");
 
     // call command 
-    exec(cmdStr, (error, stdout, stderr)=>{onExit(error, stdout, stderr);});
+    exec(cmdStr, (error, stdout, stderr)=>{
+        if(typeof onExit !== "undefined"){
+            onExit(error, stdout, stderr);
+        }
+    });
 };

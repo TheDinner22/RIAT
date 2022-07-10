@@ -5,9 +5,11 @@
  * 
  */
 
+import { callOnFileChangeLike } from ".";
 import { watch, readFile } from "fs";
 import { promisify } from "util";
 import { getSubDirectoriesRecursive } from "./getAllDirs"
+import { NodeApp, command } from "./commands";
 import config from "./config";
 
 const readFileProm = promisify(readFile);
@@ -16,9 +18,9 @@ class DirWatcher {
     private dirPath: string;
     private fsWait: boolean;
     private md5Previous: string;
-    private onEdit: (fileName: string) => void;
+    private onEdit: callOnFileChangeLike;
     
-    constructor(dirPath: string, onEdit: (fileName: string) => void){
+    constructor(dirPath: string, onEdit: callOnFileChangeLike){
         this.dirPath = dirPath;
         this.fsWait = false;
         this.md5Previous = "";
@@ -39,13 +41,14 @@ class DirWatcher {
                     this.fsWait = false;
                 }, config.deBounceMilis);
             
-                this.onEdit(filename);
+                const dirName = filename.split("/")[0]
+                this.onEdit(dirName, filename, NodeApp, command);
             }
         });
     };
 }
 
-export function makeWatcher(dirPath: string, onEdit: (filename: string) => void){
+export function makeWatcher(dirPath: string, onEdit: callOnFileChangeLike){
     // get list of all sub dirs
     const dirsList = getSubDirectoriesRecursive(dirPath);
 
