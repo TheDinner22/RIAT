@@ -36,11 +36,12 @@ class DirWatcher {
                 // little de bounce trolling
                 if (this.fsWait) { return; }
                 this.fsWait = true;
+                
+                await this.onEdit(this.dirPath, filename, NodeApp, command);
+                
                 setTimeout(() => {
                     this.fsWait = false;
                 }, config.deBounceMilis);
-            
-                await this.onEdit(this.dirPath, filename, NodeApp, command);
             }
         });
     };
