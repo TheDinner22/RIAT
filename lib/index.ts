@@ -18,7 +18,6 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
     // todo this is called every time??!
     const promiseCommand = promisify(command);
 
-    
     // get highest parent dir that is not fedora
     const highestParentDir = dirname.replace("./fedora/", "").replace("fedora/", "").split("/")[0];
 
@@ -47,19 +46,18 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
 
         // compile jsx
         if(extension === "tsx"){
+            // babel
+            // technically this is a seperate shell so cd .. is useless
+            // but i put it there anyways!!! todo
+            const babelCMD = 'npx babel routes --out-dir ./../public/clientJS --extensions ".tsx"'.split(" ");
+            await promiseCommand(["cd", "fedora", "&&", ...babelCMD, "&&", "cd", ".."]);
 
+            // mine
+            console.log("JSX START");
+            await promiseCommand(["python3", "fedora/help/build.py"]);
+            console.log("JSX END");
         }
     }
-
-
-
-
-
-
-
-
-
-
 };
 
 config.dirsToWatch.forEach((dirName) => {
