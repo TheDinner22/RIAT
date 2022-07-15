@@ -9,13 +9,15 @@ interface configENV {
     dirsToWatch: string[] 
     deBounceMilis: number
     TsconfigPathFromProjectRoot: string
+    fileToRun?: string
 }
 
 const ENV: configENV = {
     "iam": "hot as hell",
     "dirsToWatch" : [ "./fedora/lib", "./fedora/routes" ],
     "deBounceMilis": 50,
-    "TsconfigPathFromProjectRoot": "./fedora/tsconfig.json"
+    "TsconfigPathFromProjectRoot": "./fedora/tsconfig.json",
+    "fileToRun" : "./fedora/build/dist/index.js"
 };
 
 export default ENV;

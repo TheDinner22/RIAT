@@ -26,7 +26,7 @@ export class NodeApp{
     private nodeApp!: ChildProcess;
     private startCalled = false;
     private onExit: ExecFileExitHandler;
-    badSolutionLLL = promisify(this.start).bind(this);
+    private badSolutionLLL = promisify(this.start).bind(this);
 
 
     constructor(fileName: string, args: string[], onExit?: ExecFileExitHandler){

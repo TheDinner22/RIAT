@@ -12,6 +12,18 @@ import { NodeApp, ExecExitHandler, ExecFileExitHandler} from "./commands";
 import config from "./config";
 import { promisify } from "util";
 
+
+// start node app if a file is provided
+let myNodeApp: NodeApp | undefined = undefined;
+if(typeof config.fileToRun === "string"){
+    myNodeApp = new NodeApp(config.fileToRun, [], (error, std) => {
+        // empty but would be called any time the app errors or exits
+    });
+
+    // start the app
+    myNodeApp.start();
+}
+
 // this is why this line is long https://stackoverflow.com/questions/12802317/passing-class-as-parameter-causes-is-not-newable-error
 async function callOnFileChange(dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp, command: (args: string[], onExit?: ExecExitHandler) => void){
     // im using this for a project so this is an example of this being used!
@@ -23,6 +35,9 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
 
     // lib changed (compile tsc)
     if(highestParentDir === "lib"){
+        // kill the app if possible
+        if(typeof myNodeApp !== "undefined"){myNodeApp.stop();}
+
         // run the tsc command
         console.log("Compiling TSC!");
         const {stderr, stdout} = await promiseCommand(["tsc", "-p", config.TsconfigPathFromProjectRoot]);
@@ -30,6 +45,9 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
 
         // if there is output, log it
         if(stdout.trim() != ""){console.log(stdout);}
+
+        // start the app if possible
+        if(typeof myNodeApp !== "undefined"){myNodeApp.start();}
     }
 
     // routes was changed
