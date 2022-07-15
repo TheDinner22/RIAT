@@ -5,27 +5,26 @@
  * 
  */
 
-import { callOnFileChangeLike } from ".";
 import { watch, readFile } from "fs";
 import { promisify } from "util";
 import { getSubDirectoriesRecursive } from "./getAllDirs"
-import { NodeApp, command } from "./commands";
+import { NodeApp, command, ExecFileExitHandler, ExecExitHandler } from "./commands";
 import config from "./config";
 
 const readFileProm = promisify(readFile);
 
+// function that takes a function as an arg! LLL
+type callOnFileChangeLike = (dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp , command: (args: string[], onExit?: ExecExitHandler) => void) => void;
+
 class DirWatcher {
     private dirPath: string;
     private fsWait: boolean;
-    private md5Previous: string;
     private onEdit: callOnFileChangeLike;
     
     constructor(dirPath: string, onEdit: callOnFileChangeLike){
         this.dirPath = dirPath;
         this.fsWait = false;
-        this.md5Previous = "";
         this.onEdit = onEdit;
-        
         
         // console.log(`Watching for file changes on ${this.dirPath}`);
         this.watchADir();

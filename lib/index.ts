@@ -12,10 +12,6 @@ import { NodeApp, ExecExitHandler, ExecFileExitHandler} from "./commands";
 import config from "./config";
 import { promisify } from "util";
 
-// function that takes a function as an arg! LLL
-export type callOnFileChangeLike = (dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp , command: (args: string[], onExit?: ExecExitHandler) => void) => void;
-
-
 // this is why this line is long https://stackoverflow.com/questions/12802317/passing-class-as-parameter-causes-is-not-newable-error
 async function callOnFileChange(dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp, command: (args: string[], onExit?: ExecExitHandler) => void){
     // im using this for a project so this is an example of this being used!
@@ -28,17 +24,13 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
 
     // lib changed (compile tsc)
     if(highestParentDir === "lib"){
-        // cd into fedora
-        await promiseCommand(["cd", "fedora"]);
-
         // run the tsc command
-        const {stderr, stdout}  = await promiseCommand(["tsc"]);
+        console.log("Compiling TSC!");
+        const {stderr, stdout} = await promiseCommand(["tsc", "-p", config.TsconfigPathFromProjectRoot]);
+        console.log("DONE Compiling TSC!");
 
-        // if there was output, log it
+        // if there is output, log it
         if(stdout.trim() != ""){console.log(stdout);}
-
-        // cd out
-        await promiseCommand(["cd", ".."]);
     }
 
     // routes was changed
