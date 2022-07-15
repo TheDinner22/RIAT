@@ -35,11 +35,14 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
 
     // routes was changed
     else if(highestParentDir === "routes"){
-        const extension = filename.split(".")[-1];
+        const extension = filename.split(".").pop();
 
         // move css
         if(extension === "css"){
-
+            // GOD i hope this script i wrote works
+            console.log("CSS START");
+            await promiseCommand(["python3", "fedora/help/cssChange.py"]);
+            console.log("CSS END");
         }
 
         // compile jsx
