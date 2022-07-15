@@ -14,7 +14,7 @@ import config from "./config";
 const readFileProm = promisify(readFile);
 
 // function that takes a function as an arg! LLL
-type callOnFileChangeLike = (dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp , command: (args: string[], onExit?: ExecExitHandler) => void) => void;
+type callOnFileChangeLike = (dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp , command: (args: string[], onExit?: ExecExitHandler) => void) => Promise<void>;
 
 class DirWatcher {
     private dirPath: string;
@@ -40,7 +40,7 @@ class DirWatcher {
                     this.fsWait = false;
                 }, config.deBounceMilis);
             
-                this.onEdit(this.dirPath, filename, NodeApp, command);
+                await this.onEdit(this.dirPath, filename, NodeApp, command);
             }
         });
     };
