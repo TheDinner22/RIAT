@@ -13,7 +13,7 @@ interface configENV {
 
 const ENV: configENV = {
     "iam": "hot as hell",
-    "dirsToWatch" : [ "./lib" ],
+    "dirsToWatch" : [ "./fedora/lib", "./fedora/routes" ],
     "deBounceMilis": 200,
     "TsconfigPathFromProjectRoot": "./tsconfig.json"
 };

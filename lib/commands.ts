@@ -73,7 +73,8 @@ export class NodeApp{
 
     // stop
     stop(exitCode: number | NodeJS.Signals = "SIGINT"){
-        if(!this.startCalled){console.log("app is not started! cant stop it");return;}
+        // if(!this.startCalled){console.log("app is not started! cant stop it");return;}
+        if(!this.startCalled){return;}
         this.startCalled = false;
         this.nodeApp.kill(exitCode);
     };
