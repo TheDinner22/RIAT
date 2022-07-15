@@ -15,7 +15,7 @@ const ENV: configENV = {
     "iam": "hot as hell",
     "dirsToWatch" : [ "./fedora/lib", "./fedora/routes" ],
     "deBounceMilis": 200,
-    "TsconfigPathFromProjectRoot": "./tsconfig.json"
+    "TsconfigPathFromProjectRoot": "./fedora/tsconfig.json"
 };
 
 export default ENV;
