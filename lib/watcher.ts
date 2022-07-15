@@ -27,7 +27,7 @@ class DirWatcher {
         this.onEdit = onEdit;
         
         
-        console.log(`Watching for file changes on ${this.dirPath}`);
+        // console.log(`Watching for file changes on ${this.dirPath}`);
         this.watchADir();
     }
 
