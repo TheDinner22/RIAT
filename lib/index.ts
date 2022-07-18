@@ -17,7 +17,9 @@ import { promisify } from "util";
 let myNodeApp: NodeApp | undefined = undefined;
 if(typeof config.fileToRun === "string"){
     myNodeApp = new NodeApp(config.fileToRun, [], (error, std) => {
-        // empty but would be called any time the app errors or exits
+        if(error){
+            console.log(error);
+        }
     });
 
     // start the app
