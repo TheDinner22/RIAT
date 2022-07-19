@@ -13,7 +13,7 @@
 import { ChildProcess, execFile, exec, ExecFileException, ExecException } from "child_process";
 import { promisify } from "util";
 
-interface bothStdOuts {
+export interface bothStdOuts {
     stdout: string
     stderr: string
 };
@@ -26,8 +26,6 @@ export class NodeApp{
     private nodeApp!: ChildProcess;
     private startCalled = false;
     private onExit: ExecFileExitHandler;
-    private badSolutionLLL = promisify(this.start).bind(this);
-
 
     constructor(fileName: string, args: string[], onExit?: ExecFileExitHandler){
         this.fname = fileName;
@@ -48,16 +46,16 @@ export class NodeApp{
     };
 
     // start
-    start(logWhatApplogs = true, doNotHandleErrors = false, onExit: ExecFileExitHandler = this.onExit){
+    start(logWhatApplogs = true, doNotHandleErrors = false){
         if(this.startCalled){console.log("cannot start twice");return;}
         this.startCalled = true;
 
         this.nodeApp = execFile("node", [this.fname, ...this.args], (error, stdout, stderr) => {
             this.startCalled = false;
 
-            if (!doNotHandleErrors && error && error.signal != "SIGINT"){this.handleError(error);return;} // bad idea bad idea bad idea!!!
+            if ( (!doNotHandleErrors) && error && error.signal != "SIGINT" && (!error?.killed)){this.handleError(error);return;} // bad idea bad idea bad idea!!!
 
-            onExit(error, {stdout, stderr});
+            this.onExit(error, {stdout, stderr});
         });
 
         if(logWhatApplogs){
@@ -66,10 +64,6 @@ export class NodeApp{
             });
         }
     };
-
-    promiseStart(logWhatApplogs = true, doNotHandleErrors = false){
-        return this.badSolutionLLL(logWhatApplogs, doNotHandleErrors);
-    }
 
     // stop
     stop(exitCode: number | NodeJS.Signals = "SIGINT"){
@@ -84,7 +78,7 @@ export class NodeApp{
 
 // BIG FUCKING WARNING!!!! this function is dangerous!!!!!
 // exec is dangerous!!! double triple check whatever you pass into it
-export function command(args: string[], onExit?: ExecExitHandler){
+function command(args: string[], onExit: ExecExitHandler){
     // make sure there are args
     if(args.length === 0){throw new Error("args was an empty list. Can't do dat");}
 
@@ -98,9 +92,7 @@ export function command(args: string[], onExit?: ExecExitHandler){
 
     // call command 
     exec(cmdStr, (error, stdout, stderr)=>{
-        if(typeof onExit !== "undefined"){
-            onExit(error, {stdout, stderr});
-        }
+        onExit(error, {stdout, stderr});
     });
 };
 

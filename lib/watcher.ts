@@ -8,13 +8,13 @@
 import { watch, readFile } from "fs";
 import { promisify } from "util";
 import { getSubDirectoriesRecursive } from "./getAllDirs"
-import { NodeApp, command, ExecFileExitHandler, ExecExitHandler } from "./commands";
+import { NodeApp, ExecFileExitHandler, bothStdOuts, promiseCommand } from "./commands";
 import config from "./config";
 
 const readFileProm = promisify(readFile);
 
 // function that takes a function as an arg! LLL
-type callOnFileChangeLike = (dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp , command: (args: string[], onExit?: ExecExitHandler) => void) => Promise<void>;
+type callOnFileChangeLike = (dirname: string, filename: string, NodeApp: new (fileName: string, args: string[], onExit?: ExecFileExitHandler) => NodeApp, command: (args: string[]) => Promise<bothStdOuts>) => Promise<void>;
 
 class DirWatcher {
     private dirPath: string;
@@ -37,7 +37,7 @@ class DirWatcher {
                 if (this.fsWait) { return; }
                 this.fsWait = true;
                 
-                await this.onEdit(this.dirPath, filename, NodeApp, command);
+                await this.onEdit(this.dirPath, filename, NodeApp, promiseCommand);
                 
                 setTimeout(() => {
                     this.fsWait = false;
