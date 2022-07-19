@@ -66,6 +66,8 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
 
         // compile jsx
         if(extension === "tsx"){
+            console.log("JSX START");
+
             // babel
             // technically this is a seperate shell so cd .. is useless
             // but i put it there anyways!!! todo
@@ -73,7 +75,6 @@ async function callOnFileChange(dirname: string, filename: string, NodeApp: new 
             await promiseCommand(["cd", "fedora", "&&", ...babelCMD, "&&", "cd", ".."]);
 
             // mine
-            console.log("JSX START");
             await promiseCommand(["python3", "fedora/help/build.py"]);
             console.log("JSX END");
         }
